@@ -87,6 +87,22 @@ function reiterate(message){
 		}
 	})
 }
+function buyAgain(message){
+	inquirer.prompt([
+	{
+		type: "confirm",
+		name: "reiterate",
+		message: message
+	}
+	]).then(function(again){
+		if(again.reiterate){
+				toTable();
+		}
+		else{
+				greeter();
+		}
+	})
+}
 function toTable(){
   	connection.query("SELECT * FROM productlist", function(err, res) {
     if (err) throw err;
@@ -117,13 +133,13 @@ function askBuy(){
 		var choosenid = table[buy.choosenid -1].product_name;
 		var choosenQuantity = buy.choosenQuantity;
 		console.log("choosenid: "+ buy.choosenid+"choosenQuantity: "+choosenQuantity)
-		if(choosenQuantity > table[buy.choosenid].quantity){
+		if(choosenQuantity > table[buy.choosenid-1].quantity){
 			console.log("not even I cannot provide what does not exist");
 		}
 		else {
-			var newQuantity = table[buy.choosenid].quantity - choosenQuantity;
+			var newQuantity = table[buy.choosenid -1].quantity - choosenQuantity;
 			update(newQuantity, choosenid);
-			console.log('you now owe us '+choosenQuantity*table[buy.choosenid].price+' dollars.')
+			console.log('you now owe us '+choosenQuantity*table[buy.choosenid -1].price+' dollars.')
 		}
 
 	})
@@ -168,6 +184,7 @@ function update(quantity, item) {
     ],
     function(err, res) {
       console.log(res.affectedRows + " products updated!\n");
+      buyAgain("Would you like to buy another Item?");
     }
   );
 
